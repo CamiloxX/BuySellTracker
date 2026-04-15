@@ -273,3 +273,100 @@ tr:hover td { background: #0e1016; }
 .link:hover { text-decoration: underline; }
 
 .mono { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
+
+.den-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+.den-card {
+  text-align: left;
+  background: #0e1016;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: all 0.18s;
+  position: relative;
+  overflow: hidden;
+}
+.den-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(240,126,19,0) 0%, rgba(240,126,19,0) 100%);
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+}
+.den-card:hover {
+  border-color: #2a2f3d;
+  transform: translateY(-2px);
+}
+.den-card.active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow), 0 8px 24px rgba(0,0,0,0.4);
+}
+.den-card.active::before {
+  opacity: 1;
+  background: linear-gradient(135deg, rgba(240,126,19,0.08) 0%, rgba(240,126,19,0) 60%);
+}
+.den-top {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.den-amount {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+.den-unit {
+  font-size: 12px;
+  color: var(--text-mute);
+  font-weight: 600;
+}
+.den-stock {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 10px 12px;
+  background: #141822;
+  border-radius: 10px;
+}
+.den-stock strong {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.den-stock span {
+  font-size: 11px;
+  color: var(--text-mute);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.den-stock.green strong  { color: var(--green); }
+.den-stock.yellow strong { color: var(--yellow); }
+.den-stock.blue strong   { color: var(--blue); }
+.den-stock.red strong    { color: var(--red); }
+
+.den-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.den-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--text-mute);
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
