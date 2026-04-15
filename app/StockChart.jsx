@@ -1,4 +1,5 @@
 "use client";
+import { useMemo, useState } from "react";
 import {
   LineChart,
   Line,
@@ -11,54 +12,77 @@ import {
 } from "recharts";
 
 const COLORS = [
-  "#77b5ff",
-  "#6bff8e",
-  "#ffd86b",
-  "#ff7ab6",
-  "#b57aff",
-  "#ff9a6b",
-  "#6bfff0",
-  "#ff6b6b",
-  "#c6ff6b",
+  "#60a5fa", "#4ade80", "#facc15", "#f87171", "#a78bfa",
+  "#fb923c", "#2dd4bf", "#f472b6", "#c084fc",
 ];
 
 export default function StockChart({ history, products }) {
-  if (!history?.length)
-    return <p style={{ color: "#666" }}>Sin datos aún — espera la 1ª corrida.</p>;
+  const [metric, setMetric] = useState("stock"); // stock | price_usd
+  const [range, setRange] = useState(90);
 
-  // Group by captured_at (rounded to day)
-  const byTime = {};
-  for (const row of history) {
-    const day = String(row.captured_at).slice(0, 10);
-    if (!byTime[day]) byTime[day] = { date: day };
-    byTime[day][row.product_id] = row.stock;
-  }
-  const rows = Object.values(byTime).sort((a, b) =>
-    a.date.localeCompare(b.date),
-  );
+  const data = useMemo(() => {
+    if (!history?.length) return [];
+    const cutoff = Date.now() - range * 86400000;
+    const byTime = {};
+    for (const row of history) {
+      const t = new Date(row.captured_at).getTime();
+      if (t < cutoff) continue;
+      const day = String(row.captured_at).slice(0, 10);
+      if (!byTime[day]) byTime[day] = { date: day };
+      byTime[day][row.product_id] = row[metric];
+    }
+    return Object.values(byTime).sort((a, b) => a.date.localeCompare(b.date));
+  }, [history, metric, range]);
+
+  if (!history?.length)
+    return <div className="empty">Sin datos aún. Necesita ≥2 corridas del scraper.</div>;
 
   return (
-    <div style={{ width: "100%", height: 380 }}>
-      <ResponsiveContainer>
-        <LineChart data={rows}>
-          <CartesianGrid stroke="#222" />
-          <XAxis dataKey="date" stroke="#888" />
-          <YAxis stroke="#888" />
-          <Tooltip contentStyle={{ background: "#13171c", border: "1px solid #333" }} />
-          <Legend />
-          {products.map((p, i) => (
-            <Line
-              key={p.id}
-              type="monotone"
-              dataKey={p.id}
-              name={`${p.denomination_ngn ?? "?"} NGN`}
-              stroke={COLORS[i % COLORS.length]}
-              dot={false}
-              strokeWidth={2}
-            />
+    <div>
+      <div className="filters" style={{ marginBottom: 16 }}>
+        <div className="btn-group">
+          <button className={`btn ${metric === "stock" ? "active" : ""}`} onClick={() => setMetric("stock")}>Stock</button>
+          <button className={`btn ${metric === "price_usd" ? "active" : ""}`} onClick={() => setMetric("price_usd")}>Precio</button>
+        </div>
+        <div className="btn-group">
+          {[7, 30, 90].map((d) => (
+            <button key={d} className={`btn ${range === d ? "active" : ""}`} onClick={() => setRange(d)}>
+              {d}d
+            </button>
           ))}
-        </LineChart>
-      </ResponsiveContainer>
+        </div>
+      </div>
+      <div style={{ width: "100%", height: 360 }}>
+        <ResponsiveContainer>
+          <LineChart data={data} margin={{ top: 5, right: 10, bottom: 5, left: 0 }}>
+            <CartesianGrid stroke="#1e222c" vertical={false} />
+            <XAxis dataKey="date" stroke="#5a6070" tick={{ fontSize: 11 }} />
+            <YAxis stroke="#5a6070" tick={{ fontSize: 11 }} />
+            <Tooltip
+              contentStyle={{
+                background: "#12141a",
+                border: "1px solid #1e222c",
+                borderRadius: 8,
+                fontSize: 12,
+              }}
+              labelStyle={{ color: "#8b92a1" }}
+            />
+            <Legend wrapperStyle={{ fontSize: 12 }} />
+            {products.map((p, i) => (
+              <Line
+                key={p.id}
+                type="monotone"
+                dataKey={p.id}
+                name={`${p.denomination_ngn ?? "?"} NGN`}
+                stroke={COLORS[i % COLORS.length]}
+                dot={false}
+                strokeWidth={2}
+                connectNulls
+              />
+            ))}
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   );
 }
