@@ -1,6 +1,11 @@
 "use client";
 import { useMemo, useState } from "react";
 import StockChart from "./StockChart.jsx";
+import {
+  TrendingUp, BarChart, Target, Trophy, CreditCard,
+  Store, Box, AlertTriangle, Clock, Package, Award,
+  CheckCircle, XCircle, ExternalLink, DollarSign, Zap,
+} from "./Icons.jsx";
 
 const fmt = {
   usd: (n) => (n == null ? "—" : `$${Number(n).toFixed(2)}`),
@@ -174,7 +179,10 @@ export default function Dashboard({ data, error }) {
     <div className="container">
       <div className="header">
         <div>
-          <h1 className="title">📈 iTunes Nigeria Tracker</h1>
+          <h1 className="title">
+            <TrendingUp size={26} style={{ color: "var(--accent)" }} />
+            iTunes Nigeria Tracker
+          </h1>
           <p className="subtitle">
             Monitoreo de stock y precios · vendedor principal:{" "}
             <strong style={{ color: "var(--text)" }}>DexAshkan</strong>
@@ -186,30 +194,40 @@ export default function Dashboard({ data, error }) {
         </div>
       </div>
 
-      {error && <div className="error-banner">⚠️ {error}</div>}
+      {error && (
+        <div className="error-banner">
+          <AlertTriangle size={16} />
+          <span>{error}</span>
+        </div>
+      )}
 
       <div className="stats">
         <div className="stat-card">
+          <div className="stat-icon"><Package size={18} /></div>
           <div className="stat-label">Productos</div>
           <div className="stat-value">{stats.total}</div>
           <div className="stat-sub">{stats.inStock} en stock</div>
         </div>
         <div className="stat-card">
+          <div className="stat-icon accent"><Box size={18} /></div>
           <div className="stat-label">Stock total</div>
           <div className="stat-value accent mono">{fmt.int(stats.totalUnits)}</div>
           <div className="stat-sub">unidades disponibles</div>
         </div>
         <div className="stat-card">
+          <div className="stat-icon green"><Zap size={18} /></div>
           <div className="stat-label">Vendidos histórico</div>
           <div className="stat-value green mono">{fmt.int(stats.totalSold)}</div>
           <div className="stat-sub">total acumulado</div>
         </div>
         <div className="stat-card">
+          <div className="stat-icon"><DollarSign size={18} /></div>
           <div className="stat-label">Precio promedio</div>
           <div className="stat-value mono">{fmt.usd(stats.avgPrice)}</div>
           <div className="stat-sub">{stats.bestDeals} con mejor precio del mercado</div>
         </div>
         <div className="stat-card">
+          <div className="stat-icon yellow"><AlertTriangle size={18} /></div>
           <div className="stat-label">Alertas</div>
           <div className="stat-value yellow mono">{stats.lowStock}</div>
           <div className="stat-sub">
@@ -222,7 +240,7 @@ export default function Dashboard({ data, error }) {
       {/* ===== Denomination selector ===== */}
       <div className="section">
         <div className="section-head">
-          <h2 className="section-title">💳 Denominaciones</h2>
+          <h2 className="section-title"><CreditCard size={18} /> Denominaciones</h2>
           <div className="filters">
             <button
               className={`btn ${selectedDen == null ? "active" : ""}`}
@@ -263,8 +281,8 @@ export default function Dashboard({ data, error }) {
                   )}
                 </div>
                 <div className="den-meta">
-                  <span>🏪 {d.competitorCount} competidores</span>
-                  <span>📦 {fmt.int(d.sold)} vendidos</span>
+                  <span><Store size={12} /> {d.competitorCount} competidores</span>
+                  <span><Box size={12} /> {fmt.int(d.sold)} vendidos</span>
                 </div>
               </button>
             );
@@ -276,7 +294,7 @@ export default function Dashboard({ data, error }) {
       <div className="section">
         <div className="section-head">
           <h2 className="section-title">
-            🎯 Stock DexAshkan
+            <Target size={18} /> Stock DexAshkan
             {selectedDen && (
               <span className="pill pill-blue" style={{ marginLeft: 8 }}>
                 Filtrado: {fmt.int(selectedDen)} NGN
@@ -350,7 +368,7 @@ export default function Dashboard({ data, error }) {
       <div className="section">
         <div className="section-head">
           <h2 className="section-title">
-            📊 Histórico
+            <BarChart size={18} /> Histórico
             {selectedDen && (
               <span className="pill pill-blue" style={{ marginLeft: 8 }}>
                 {fmt.int(selectedDen)} NGN
@@ -370,7 +388,7 @@ export default function Dashboard({ data, error }) {
       <div className="section">
         <div className="section-head">
           <h2 className="section-title">
-            🏆 Comparador de precios
+            <Trophy size={18} /> Comparador de precios
             {selectedDen && (
               <span className="pill pill-blue" style={{ marginLeft: 8 }}>
                 {fmt.int(selectedDen)} NGN

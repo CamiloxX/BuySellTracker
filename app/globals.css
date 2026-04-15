@@ -69,7 +69,11 @@ button, input, select { font-family: inherit; }
   background-clip: text;
   color: transparent;
   letter-spacing: -0.02em;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
 }
+.title svg { color: var(--accent); stroke: var(--accent); }
 
 .subtitle {
   color: var(--text-dim);
@@ -110,7 +114,24 @@ button, input, select { font-family: inherit; }
   border-radius: 12px;
   padding: 18px 20px;
   transition: all 0.2s;
+  position: relative;
 }
+.stat-icon {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #1a1d25;
+  border-radius: 8px;
+  color: var(--text-dim);
+}
+.stat-icon.accent { color: var(--accent); background: var(--accent-glow); }
+.stat-icon.green  { color: var(--green);  background: rgba(74,222,128,0.1); }
+.stat-icon.yellow { color: var(--yellow); background: rgba(250,204,21,0.1); }
 .stat-card:hover {
   border-color: #2a2f3d;
   transform: translateY(-1px);
@@ -160,8 +181,9 @@ button, input, select { font-family: inherit; }
   margin: 0;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
+.section-title svg { color: var(--accent); }
 
 .filters {
   display: flex;
@@ -259,15 +281,6 @@ tr:hover td { background: #0e1016; }
   font-size: 14px;
 }
 
-.error-banner {
-  background: rgba(248,113,113,0.08);
-  border: 1px solid rgba(248,113,113,0.3);
-  color: var(--red);
-  padding: 12px 16px;
-  border-radius: 10px;
-  margin-bottom: 20px;
-  font-size: 13px;
-}
 
 .link { color: var(--blue); }
 .link:hover { text-decoration: underline; }
@@ -369,4 +382,21 @@ tr:hover td { background: #0e1016; }
   color: var(--text-mute);
   padding-top: 8px;
   border-top: 1px solid var(--border);
+}
+.den-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.error-banner {
+  background: rgba(248,113,113,0.08);
+  border: 1px solid rgba(248,113,113,0.3);
+  color: var(--red);
+  padding: 12px 16px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
