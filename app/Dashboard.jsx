@@ -1,5 +1,6 @@
 "use client";
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import StockChart from "./StockChart.jsx";
 import {
   TrendingUp, BarChart, Target, Trophy, CreditCard,
@@ -188,9 +189,14 @@ export default function Dashboard({ data, error }) {
             <strong style={{ color: "var(--text)" }}>DexAshkan</strong>
           </p>
         </div>
-        <div className="badge">
-          <span className="badge-dot" />
-          Última actualización: {fmt.date(stats.lastUpdate)}
+        <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+          <Link href="/recarga" className="nav-link">
+            ₦ Recarga YouTube Premium →
+          </Link>
+          <div className="badge">
+            <span className="badge-dot" />
+            Última actualización: {fmt.date(stats.lastUpdate)}
+          </div>
         </div>
       </div>
 

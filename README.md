@@ -129,6 +129,18 @@ curl -H "Authorization: Bearer $CRON_SECRET" \
   https://tu-app.vercel.app/api/cron/scrape
 ```
 
+## Sección extra: Recarga Tracker (YouTube Premium · Nigeria)
+
+Ruta independiente en **`/recarga`** (enlazada desde el header del dashboard). Avisa cuándo recargar el saldo de YouTube Premium (facturado en nairas ₦) a partir del saldo, el cobro mensual y la fecha de cobro.
+
+- **Sin backend ni DB:** toda la config se guarda en `localStorage` (clave `recarga_config`).
+- **Lógica pura** en `lib/calc.js` (fechas de cobro, saldo proyectado, cobro que falla, monto a recargar para la meta, conversión a COP). Fechas con `Date` nativo.
+- **UI** en `app/recarga/` (client component + CSS scopeado `app/recarga/recarga.css`, clases `rt-`). Tema oscuro "recibo/terminal fintech", independiente del dashboard naranja.
+
+Valores por defecto precargados: saldo ₦4600, cobro ₦3600, día 9, aviso 7 días, fin de descuento 2027-02-28, tasa 2.66 COP/₦. Editables en el acordeón "Ajustes".
+
+Como es parte de la misma app Next.js, **se despliega junto al resto en Vercel** (no necesita GitHub Pages): basta con `vercel --prod`. En local: `npm run dev` y abre `http://localhost:3000/recarga`.
+
 ## Limitaciones conocidas
 
 - Los selectores del scraper son heurísticos (regex sobre texto). Si BuySellVouchers cambia su HTML, hay que ajustar `lib/scraper.js`.
