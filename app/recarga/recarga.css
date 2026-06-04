@@ -83,12 +83,8 @@
   border-radius: 13px;
   display: grid;
   place-items: center;
-  background: linear-gradient(150deg, var(--rt-lime), #9bd62f);
-  color: #0b0c08;
-  font-family: "Bricolage Grotesque", sans-serif;
-  font-weight: 800;
-  font-size: 26px;
-  box-shadow: 0 0 0 1px rgba(200, 243, 74, 0.4), 0 8px 26px rgba(200, 243, 74, 0.2);
+  background: var(--rt-card-2);
+  box-shadow: 0 0 0 1px var(--rt-line), 0 8px 26px rgba(255, 0, 0, 0.12);
 }
 .rt-htitle {
   font-family: "Bricolage Grotesque", sans-serif;
