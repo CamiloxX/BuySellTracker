@@ -35,7 +35,11 @@ export default function RecargaTracker() {
 
   // Cargar config persistida solo en el cliente (evita mismatch de hidratación).
   useEffect(() => {
-    setConfig(loadConfig());
+    const c = loadConfig();
+    // Si no hay fecha de registro del saldo, anclar a hoy para empezar a
+    // descontar los cobros que pasen a partir de ahora.
+    if (!c.balanceDate) c.balanceDate = toISO(new Date());
+    setConfig(c);
     setMounted(true);
   }, []);
 
@@ -50,11 +54,24 @@ export default function RecargaTracker() {
     setConfig((c) => ({ ...c, [key]: v === "" ? "" : v }));
   };
 
-  const reset = () => setConfig(DEFAULT_CONFIG);
+  // Editar el saldo = "este es mi saldo de HOY": re-ancla la fecha a hoy,
+  // así no se le restan cobros anteriores.
+  const setBalance = (e) => {
+    const v = e.target.value;
+    setConfig((c) => ({ ...c, balance: v === "" ? "" : v, balanceDate: toISO(new Date()) }));
+  };
+
+  const reset = () =>
+    setConfig({ ...DEFAULT_CONFIG, balanceDate: toISO(new Date()) });
 
   const recargarYa = () => {
     const add = Number(plan.amountForTarget) || 0;
-    setConfig((c) => ({ ...c, balance: (Number(c.balance) || 0) + add }));
+    // Nuevo saldo real = saldo efectivo de hoy + lo recargado, anclado a hoy.
+    setConfig((c) => ({
+      ...c,
+      balance: plan.balance + add,
+      balanceDate: toISO(new Date()),
+    }));
   };
 
   const setTarget = (e) =>
@@ -147,6 +164,15 @@ export default function RecargaTracker() {
             <span>{formatNaira(plan.balance)} de saldo</span>
             <span>meta {formatNaira(plan.neededForTarget)}</span>
           </div>
+          {plan.autoCount > 0 && (
+            <p className="rt-hero-sub" style={{ marginTop: 10, fontSize: 11.5 }}>
+              Descuento automático: se restaron{" "}
+              <strong className="rt-tnum">{plan.autoCount}</strong>{" "}
+              {plan.autoCount === 1 ? "cobro" : "cobros"} (
+              <strong className="rt-tnum">−{formatNaira(plan.autoDeducted)}</strong>) desde el{" "}
+              {formatLongDate(plan.anchor)} que registraste el saldo.
+            </p>
+          )}
         </section>
 
         {/* Plan de recarga */}
@@ -245,7 +271,7 @@ export default function RecargaTracker() {
           {showSettings && (
             <>
               <div className="rt-grid">
-                <Field label="Saldo actual (₦)" value={config.balance} onChange={set("balance")} type="number" />
+                <Field label="Saldo actual (₦)" value={plan.balance} onChange={setBalance} type="number" />
                 <Field label="Cobro mensual (₦)" value={config.charge} onChange={set("charge")} type="number" />
                 <Field label="Día del cobro" value={config.chargeDay} onChange={set("chargeDay")} type="number" />
                 <Field label="Aviso (días antes)" value={config.buffer} onChange={set("buffer")} type="number" />
@@ -253,6 +279,10 @@ export default function RecargaTracker() {
                 <Field label="Precio tras descuento (₦)" value={config.priceAfter} onChange={set("priceAfter")} type="number" placeholder="desconocido" />
                 <Field label="COP por ₦1" value={config.copRate} onChange={set("copRate")} type="number" step="0.01" />
               </div>
+              <p className="rt-note">
+                El saldo baja solo en cada cobro (día {config.chargeDay}). Al editarlo aquí,
+                se toma como tu saldo de hoy y el conteo arranca de nuevo desde esta fecha.
+              </p>
               <hr className="rt-dash" />
               <button className="rt-btn ghost" onClick={reset}>
                 Restablecer valores por defecto
