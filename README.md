@@ -141,6 +141,21 @@ Valores por defecto precargados: saldo ₦4600, cobro ₦3600, día 9, aviso 7 d
 
 Como es parte de la misma app Next.js, **se despliega junto al resto en Vercel** (no necesita GitHub Pages): basta con `vercel --prod`. En local: `npm run dev` y abre `http://localhost:3000/recarga`.
 
+### Descuento automático
+El saldo baja solo en cada cobro: se guarda la fecha en que registraste el saldo (ancla) y se restan en vivo los cobros que pasaron hasta hoy (nunca descuenta dos veces). Editar el saldo o tocar "Ya recargué" re-ancla la fecha a hoy.
+
+### Alertas por Telegram / Email / WhatsApp
+La página tiene un botón **"Guardar para alertas"** que envía tu config a la base de datos (`POST /api/recarga/config`). Un **Vercel Cron diario** (`/api/cron/recarga`, 09:00 UTC) recalcula el saldo y, cuando entras en zona de recarga (`buffer` días antes del cobro que te deja sin saldo), te avisa **una vez** por cada canal configurado. Variables de entorno (cada canal se activa solo si están presentes):
+
+| Canal | Variables | Notas |
+|---|---|---|
+| Telegram | `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` | Ya configuradas en el proyecto. |
+| Email (Resend) | `RESEND_API_KEY`, `ALERT_EMAIL`, `ALERT_EMAIL_FROM` | Crea API key en resend.com. `ALERT_EMAIL` = tu correo; `ALERT_EMAIL_FROM` opcional (default `onboarding@resend.dev`). |
+| WhatsApp (CallMeBot) | `CALLMEBOT_PHONE`, `CALLMEBOT_APIKEY` | Gratis/personal. Sigue el alta en callmebot.com/whatsapp para obtener tu apikey. `CALLMEBOT_PHONE` con código de país, sin `+`. |
+| WhatsApp (Twilio) | `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_WHATSAPP_FROM`, `TWILIO_WHATSAPP_TO` | Formato `whatsapp:+57300...`. Requiere unir el sandbox de Twilio. |
+
+Probar el cron a mano: `curl -H "Authorization: Bearer $CRON_SECRET" https://tu-app.vercel.app/api/cron/recarga`
+
 ## Limitaciones conocidas
 
 - Los selectores del scraper son heurísticos (regex sobre texto). Si BuySellVouchers cambia su HTML, hay que ajustar `lib/scraper.js`.

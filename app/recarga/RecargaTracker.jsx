@@ -32,6 +32,7 @@ export default function RecargaTracker() {
   const [config, setConfig] = useState(DEFAULT_CONFIG);
   const [mounted, setMounted] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [alertState, setAlertState] = useState({ saving: false, msg: "" });
 
   // Cargar config persistida solo en el cliente (evita mismatch de hidratación).
   useEffect(() => {
@@ -76,6 +77,32 @@ export default function RecargaTracker() {
 
   const setTarget = (e) =>
     setConfig((c) => ({ ...c, target: e.target.value }));
+
+  // Guarda la config en el servidor para que el cron diario revise el saldo
+  // y avise por los canales configurados aunque la página esté cerrada.
+  const guardarAlertas = async () => {
+    setAlertState({ saving: true, msg: "" });
+    try {
+      const res = await fetch("/api/recarga/config", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          config,
+          email: config.email || "",
+          alertDays: Number(config.buffer) || 7,
+        }),
+      });
+      const j = await res.json();
+      setAlertState({
+        saving: false,
+        msg: j.ok
+          ? "Listo. Revisaremos tu saldo a diario y te avisaremos."
+          : `Error: ${j.error || "no se pudo guardar"}`,
+      });
+    } catch (e) {
+      setAlertState({ saving: false, msg: `Error: ${e.message}` });
+    }
+  };
 
   // Texto y datos del hero según urgencia.
   const heroBig = !plan.failingCharge
@@ -258,8 +285,34 @@ export default function RecargaTracker() {
           </p>
         </section>
 
-        {/* Ajustes (acordeón) */}
+        {/* Alertas */}
         <section className="rt-card rt-anim" style={{ animationDelay: "280ms" }}>
+          <div className="rt-label">Alertas</div>
+          <p className="rt-note" style={{ marginTop: 8 }}>
+            Te avisamos cuando entres en zona de recarga (~{config.buffer} días antes
+            del cobro que te deja sin saldo) por los canales configurados:
+            Telegram, email, WhatsApp.
+          </p>
+          <div className="rt-field full" style={{ marginTop: 12 }}>
+            <label>Tu email (para aviso por correo)</label>
+            <input
+              className="rt-input"
+              type="email"
+              value={config.email || ""}
+              onChange={set("email")}
+              placeholder="tucorreo@gmail.com"
+            />
+          </div>
+          <button className="rt-btn" onClick={guardarAlertas} disabled={alertState.saving}>
+            {alertState.saving ? "Guardando…" : "Guardar para alertas"}
+          </button>
+          {alertState.msg && (
+            <p className="rt-note" style={{ marginTop: 10 }}>{alertState.msg}</p>
+          )}
+        </section>
+
+        {/* Ajustes (acordeón) */}
+        <section className="rt-card rt-anim" style={{ animationDelay: "350ms" }}>
           <div
             className="rt-acc-head"
             onClick={() => setShowSettings((s) => !s)}
